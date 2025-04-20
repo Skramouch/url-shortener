@@ -1,0 +1,25 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Go files
+*.go text diff=golang
+*.mod text
+*.sum text
+
+# Documentation
+*.md text
+*.txt text
+
+# Scripts
+*.sh text
+*.bat text eol=crlf
+
+# Configs
+*.yml text
+*.yaml text
+*.json text
+
+# Git
+.gitattributes text
+.gitignore text
+.gitconfig text
