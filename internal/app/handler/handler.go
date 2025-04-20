@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 
@@ -19,14 +18,6 @@ func New(storage *storage.URLStorage, baseURL string) *URLHandler {
 		storage: storage,
 		baseURL: baseURL,
 	}
-}
-
-type createRequest struct {
-	URL string `json:"url"`
-}
-
-type createResponse struct {
-	ShortURL string `json:"short_url"`
 }
 
 // CreateShortURL обрабатывает POST-запрос на создание короткого URL
@@ -50,13 +41,11 @@ func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := createResponse{
-		ShortURL: h.baseURL + "/" + id,
-	}
+	shortURL := h.baseURL + "/" + id
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
+	w.Write([]byte(shortURL))
 }
 
 func (h *URLHandler) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
