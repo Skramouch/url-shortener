@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/Skramouch/url-shortener/internal/app/storage"
@@ -30,20 +31,22 @@ type createResponse struct {
 
 // CreateShortURL обрабатывает POST-запрос на создание короткого URL
 func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
-	var req createRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if req.URL == "" {
-		http.Error(w, "URL is required", http.StatusBadRequest)
-		return
-	}
-
-	id, err := h.storage.Save(req.URL)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Ошибка чтения тела запроса", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	url := string(body)
+	if url == "" {
+		http.Error(w, "URL обязателен", http.StatusBadRequest)
+		return
+	}
+
+	id, err := h.storage.Save(url)
+	if err != nil {
+		http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
 		return
 	}
 
